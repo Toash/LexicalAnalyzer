@@ -46,18 +46,42 @@ int main(int argc, char *argv[])
     // Repeatedly call getNextToken until it returns DONE or ERR.
     LexItem token;
     int linenumber = 0;
+    int tokenCount = 0;
+
+    inFile.seekg(0); // reset input stream to beginning
     if (inFile.is_open())
     {
         while (true)
         {
             token = getNextToken(inFile, linenumber);
-
+            tokenCount++;
             // Equals operator is overridden
             if (token == DONE)
             {
                 break;
             }
+
+            // error handling
+            if (token == ERR)
+            {
+                std::cout << "error on line " << linenumber;
+                std::exit(1);
+            }
+            // std::cout << token;
         }
     }
+    else
+    {
+        std::cout << "NO SPECIFIED INPUT FILE.\n";
+        exit(1);
+    }
+
+    // Summary info
+    std::cout << "Lines: " << linenumber << std::endl;
+    std::cout << "Total Tokens: " << tokenCount << std::endl;
+    std::cout << "Identifiers: " << std::endl;
+    std::cout << "Integers: " << std::endl;
+    std::cout << "Reals: " << std::endl;
+    std::cout << "Strings: " << std::endl;
     return 0;
 }
