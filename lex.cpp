@@ -1,5 +1,6 @@
 #include "lex.h"
 #include <regex> // we are using regex to find the tokens.
+#include <cctype> // To recognize characters.
 
 LexItem getNextToken(istream &in, int &linenumber)
 {
@@ -32,12 +33,19 @@ LexItem getNextToken(istream &in, int &linenumber)
                 continue;
             }
 
+            // start building our lexeme
             lexeme = c;
 
             // Comment is defined by all characters after !
             if (c == '!')
             {
                 state = INCOMMENT;
+                continue;
+            }
+
+            // Recognizing IDENT
+            if(std::isalpha(c)){
+                state = INID;
                 continue;
             }
         case INCOMMENT:
@@ -48,7 +56,23 @@ LexItem getNextToken(istream &in, int &linenumber)
                 state = START;
             }
             continue;
+        case INID:
+            // check if the char is valid for an identifier.
+            string identifierRegex = "[a-zA-Z]([a-zA-Z]|[0-9]|_)*";
+            if(std::regex_match(lexeme + c, std::regex(identifierRegex))){
+                lexeme += c;
+            }
+            // If end of file, or no longer IDENT
+            if(in.peek() == -1 || !std::regex_match(lexeme+c,std::regex(identifierRegex))){
+                state = START;
+                in.putback(c); // what does this do?
+
+                // check for reserved keywords
+            }
+            break;
         }
+
+
     }
     return LexItem(DONE, "", linenumber);
 }
