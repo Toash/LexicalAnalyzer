@@ -1,6 +1,12 @@
 #include "lex.h"
-#include <regex> // we are using regex to find the tokens.
+#include <regex>  // we are using regex to find the tokens.
 #include <cctype> // To recognize characters.
+#include <string>
+
+// compare string without regard to case
+bool nonCaseSensitiveEquals(std::string &a, std::string &b)
+{
+}
 
 LexItem getNextToken(istream &in, int &linenumber)
 {
@@ -11,7 +17,9 @@ LexItem getNextToken(istream &in, int &linenumber)
         INID,
         INSTRING,
         ININT,
-        INCOMMENT
+        INREAL,
+        INCOMMENT,
+        INSIGN
     };
     State state = START;
     string lexeme;
@@ -44,35 +52,88 @@ LexItem getNextToken(istream &in, int &linenumber)
             }
 
             // Recognizing IDENT
-            if(std::isalpha(c)){
+            if (std::isalpha(c))
+            {
                 state = INID;
                 continue;
             }
-        case INCOMMENT:
-            // comment lasts till end of line. does not have token.
-            if (c == '\n')
+            // Recognizing integer
+            if (std::isdigit(c))
             {
-                linenumber++;
-                state = START;
+                state = ININT;
+                continue;
             }
-            continue;
-        case INID:
-            // check if the char is valid for an identifier.
-            string identifierRegex = "[a-zA-Z]([a-zA-Z]|[0-9]|_)*";
-            if(std::regex_match(lexeme + c, std::regex(identifierRegex))){
-                lexeme += c;
-            }
-            // If end of file, or no longer IDENT
-            if(in.peek() == -1 || !std::regex_match(lexeme+c,std::regex(identifierRegex))){
-                state = START;
-                in.putback(c); // what does this do?
+            // recognize single chars
+            switch (c)
+            {
+            case ('+'):
+                return LexItem(PLUS, lexeme, linenumber);
+            case ('-'):
+                return LexItem(MINUS, lexeme, linenumber);
+            case ('*'):
+                // peek next char
 
-                // check for reserved keywords
+                return LexItem(MULT, lexeme, linenumber);
+            case ('/'):
+                return LexItem(DIV, lexeme, linenumber);
+            case ('='):
+                return LexItem(ASSOP, lexeme, linenumber);
+            case ('=='):
+                return LexItem(EQ, lexeme, linenumber);
+            case ('<'):
+                return LexItem(LTHAN, lexeme, linenumber);
+            case ('>'):
+                return LexItem(GTHAN, lexeme, linenumber);
+
+                // delimiters
+                /*
+                case (','):
+                    return LexItem(COMMA, lexeme, linenumber);
+                case ('('):
+                    return LexItem(LPAREN, lexeme, linenumber);
+                case (')'):
+                    return LexItem(RPAREN, lexeme, linenumber);
+                case ('.'):
+                    return LexItem(DOT, lexeme, linenumber);
+                case ('*'):
+                    return LexItem(DEF, lexeme, linenumber);
+                }
+                */
+
+                // handle operators like **, ==, //, ::
+
+            case INCOMMENT:
+                // comment lasts till end of line. does not have token.
+                if (c == '\n')
+                {
+                    linenumber++;
+                    state = START;
+                }
+                continue;
+            case INID:
+                // check if the char is valid for an identifier.
+                string identifierRegex = "[a-zA-Z]([a-zA-Z]|[0-9]|_)*";
+                if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
+                {
+                    lexeme += c;
+                }
+                // If end of file, or no longer IDENT
+                if (in.peek() == -1 || !std::regex_match(lexeme + c, std::regex(identifierRegex)))
+                {
+                    state = START;
+                    in.putback(c); // put back into stream
+
+                    // check for reserved keywords
+                    // reserved words are NOT case sensitive
+                    if (lexeme == "program")
+                    {
+                        return LexItem(PROGRAM, lexeme, linenumber);
+                        // return LexItem
+                    }
+                }
+                break;
             }
-            break;
         }
-
-
+        return LexItem(DONE, "", linenumber);
     }
-    return LexItem(DONE, "", linenumber);
 }
