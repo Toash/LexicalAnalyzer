@@ -117,16 +117,6 @@ LexItem getNextToken(istream &in, int &linenumber)
                 return LexItem(GTHAN, lexeme, linenumber);
 
             case (','):
-                return LexItem(COMMA,lexeme,linenumber);
-            case ('\"'):
-                state = INSTRING;
-            case ('\''):
-                state = INSTRING;
-            }
-                
-            // delimiters
-            /*
-            case (','):
                 return LexItem(COMMA, lexeme, linenumber);
             case ('('):
                 return LexItem(LPAREN, lexeme, linenumber);
@@ -134,12 +124,13 @@ LexItem getNextToken(istream &in, int &linenumber)
                 return LexItem(RPAREN, lexeme, linenumber);
             case ('.'):
                 return LexItem(DOT, lexeme, linenumber);
-            case ('*'):
-                return LexItem(DEF, lexeme, linenumber);
-            }
-            */
 
-            // handle operators like **, ==, //, ::
+            case ('\"'):
+                state = INSTRING;
+            case ('\''):
+                state = INSTRING;
+            }
+
 
         case INID:
             // check if the char is valid for an identifier.
@@ -148,6 +139,8 @@ LexItem getNextToken(istream &in, int &linenumber)
             {
                 lexeme += c;
             } else if(c == ' ' || c == '\n'){
+                state = START;
+                in.putback(c);
                 return id_or_kw(lexeme,linenumber);
             } else{
                 // It must be a , ., etc. THAT DOESNT DELIMIT
@@ -214,6 +207,7 @@ LexItem getNextToken(istream &in, int &linenumber)
             
             }
         }
+        // this returns once we exhaust the istream
         return LexItem(DONE, "", linenumber);
     }
     

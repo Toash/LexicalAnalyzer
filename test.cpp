@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
             // Equals operator is overridden, will compare token.
             if (lexItem == DONE)
             {
-                std::cout<<"DONE!!!!!"<<std::endl;
+                //std::cout<<"DONE!!!!!"<<std::endl;
                 break;
             }
 
@@ -144,9 +144,9 @@ int main(int argc, char *argv[])
     // Summary info
     std::cout << "Lines: " << linenumber << std::endl;
     std::cout << "Total Tokens: " << tokenCount << std::endl;
-    std::cout << "Identifiers: " << std::endl;
-    std::cout << "Integers: " << std::endl;
-    std::cout << "Reals: " << std::endl;
-    std::cout << "Strings: " << std::endl;
+    std::cout << "Identifiers: " << identCount<< std::endl;
+    std::cout << "Integers: " << intCount<<std::endl;
+    std::cout << "Reals: " << realCount<<std::endl;
+    std::cout << "Strings: " << stringCount<<std::endl;
     return 0;
 }
