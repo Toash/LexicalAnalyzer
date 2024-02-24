@@ -3,9 +3,35 @@
 #include <cctype> // To recognize characters.
 #include <string>
 
-// compare string without regard to case
-bool nonCaseSensitiveEquals(std::string &a, std::string &b)
-{
+
+// map string value of keyword to its token;
+std::map<string,Token> stringToKeyword = {
+    {"if", IF},
+    {"else", ELSE},
+    {"print", PRINT},
+    {"integer", INTEGER},
+    {"real", REAL},
+    {"character", CHARACTER},
+    {"end", END},
+    {"then", THEN},
+    {"program", PROGRAM},
+    {"len", LEN},
+    {"ident", IDENT},
+    {"iconst", ICONST},
+    {"rconst", RCONST},
+    {"sconst", SCONST},
+    {"bconst", BCONST}
+    };
+
+LexItem id_or_kw(const string &lexeme, int linenum){
+    //TODO: Make it case insensitive
+    if(stringToKeyword.find(lexeme) != stringToKeyword.end()){
+        //keyword
+        return LexItem(stringToKeyword[lexeme],lexeme,linenum);
+    } else{
+        //identifier
+        return LexItem(IDENT,lexeme,linenum);
+    }
 }
 
 LexItem getNextToken(istream &in, int &linenumber)
@@ -90,10 +116,8 @@ LexItem getNextToken(istream &in, int &linenumber)
             case ('>'):
                 return LexItem(GTHAN, lexeme, linenumber);
 
-            case ('.'):
-                //look ahead to see if it is actually a real number.
-                state = INREAL;
-
+            case (','):
+                return LexItem(COMMA,lexeme,linenumber);
             case ('\"'):
                 state = INSTRING;
             case ('\''):
@@ -117,71 +141,76 @@ LexItem getNextToken(istream &in, int &linenumber)
 
             // handle operators like **, ==, //, ::
 
-            case INID:
-                // check if the char is valid for an identifier.
-                //std::cout<<"IN IDENT STATE!!\n";
-                if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
-                {
-                    lexeme += c;
-                }
-                if(c == ' ' || c == '\n'){
-                    return LexItem(IDENT, lexeme, linenumber);
-                }
-                continue;
-            //  1 or more integer
-            case ININT:
-                
-
-
-                if(c=='.'){
-                    // we have a real number!
-                    state = INREAL;
-                }
-                continue;
-
-            case INREAL:
-                
-                if(std::regex_match(lexeme + c,std::regex(realRegex))){
-                    lexeme += c;
-                } else{
-                    if(c==' '){
-                        return LexItem(RCONST,lexeme, linenumber);
-                    }
-
-                    //we have something else (.9 )
-                    return LexItem(ERR,lexeme,linenumber);
-                }
-            case INSTRING:
-
-                delimitType = lexeme[0];
-
-                //Strings must be on the same line
-                if(c == '\n'){
-                    return LexItem(ERR,lexeme,linenumber);
-                }
-
-                if(delimitType == '\''){
-                    if(c == '\''){
-                        lexeme += c;
-                        return LexItem(SCONST,lexeme,linenumber);
-                    }
-                }
-                else if(delimitType == '\"'){
-                    if(c == '\"'){
-                        lexeme += c;
-                        return LexItem(SCONST,lexeme,linenumber);
-                    }
-                }
-
+        case INID:
+            // check if the char is valid for an identifier.
+            //std::cout<<"IN IDENT STATE!!\n";
+            if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
+            {
                 lexeme += c;
-            case INCOMMENT:
-                // comment lasts till end of line. does not have token.
-                if (c == '\n')
-                {
-                    linenumber++;
-                    state = START;
+            } else if(c == ' ' || c == '\n'){
+                return id_or_kw(lexeme,linenumber);
+            } else{
+                // It must be a , ., etc. THAT DOESNT DELIMIT
+                // putback so we can see what it is, but we have the 
+                state = START;
+                in.putback(c);
+                return id_or_kw(lexeme,linenumber);
+            }
+            continue;
+        //  1 or more integer
+        case ININT:
+            
+
+
+            if(c=='.'){
+                // we have a real number!
+                state = INREAL;
+            }
+            continue;
+
+        case INREAL:
+            
+            if(std::regex_match(lexeme + c,std::regex(realRegex))){
+                lexeme += c;
+            } else{
+                if(c==' '){
+                    return LexItem(RCONST,lexeme, linenumber);
                 }
-                continue;
+
+                //we have something else (.9 )
+                return LexItem(ERR,lexeme,linenumber);
+            }
+        case INSTRING:
+
+            delimitType = lexeme[0];
+
+            //Strings must be on the same line
+            if(c == '\n'){
+                return LexItem(ERR,lexeme,linenumber);
+            }
+
+            if(delimitType == '\''){
+                if(c == '\''){
+                    lexeme += c;
+                    return LexItem(SCONST,lexeme,linenumber);
+                }
+            }
+            else if(delimitType == '\"'){
+                if(c == '\"'){
+                    lexeme += c;
+                    return LexItem(SCONST,lexeme,linenumber);
+                }
+            }
+
+            lexeme += c;
+        case INCOMMENT:
+            // comment lasts till end of line. does not have token.
+            if (c == '\n')
+            {
+                linenumber++;
+                state = START;
+            }
+            continue;
             
             }
         }

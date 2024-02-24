@@ -6,43 +6,42 @@
 
 // get token name from enum
 
-std::map<Token, std::string> tokenToString;
-void populateTokenMap()
-{
-    tokenToString.insert(std::make_pair(IF, "IF"));
-    tokenToString.insert(std::make_pair(ELSE, "ELSE"));
-    tokenToString.insert(std::make_pair(PRINT, "PRINT"));
-    tokenToString.insert(std::make_pair(INTEGER, "INTEGER"));
-    tokenToString.insert(std::make_pair(REAL, "REAL"));
-    tokenToString.insert(std::make_pair(CHARACTER, "CHARACTER"));
-    tokenToString.insert(std::make_pair(END, "END"));
-    tokenToString.insert(std::make_pair(THEN, "THEN"));
-    tokenToString.insert(std::make_pair(PROGRAM, "PROGRAM"));
-    tokenToString.insert(std::make_pair(LEN, "LEN"));
-    tokenToString.insert(std::make_pair(IDENT, "IDENT"));
-    tokenToString.insert(std::make_pair(ICONST, "ICONST"));
-    tokenToString.insert(std::make_pair(RCONST, "RCONST"));
-    tokenToString.insert(std::make_pair(SCONST, "SCONST"));
-    tokenToString.insert(std::make_pair(BCONST, "BCONST"));
-    tokenToString.insert(std::make_pair(PLUS, "PLUS"));
-    tokenToString.insert(std::make_pair(MINUS, "MINUS"));
-    tokenToString.insert(std::make_pair(MULT, "MULT"));
-    tokenToString.insert(std::make_pair(DIV, "DIV"));
-    tokenToString.insert(std::make_pair(ASSOP, "ASSOP"));
-    tokenToString.insert(std::make_pair(EQ, "EQ"));
-    tokenToString.insert(std::make_pair(POW, "POW"));
-    tokenToString.insert(std::make_pair(GTHAN, "GTHAN"));
-    tokenToString.insert(std::make_pair(LTHAN, "LTHAN"));
-    tokenToString.insert(std::make_pair(CAT, "CAT"));
-    tokenToString.insert(std::make_pair(COMMA, "COMMA"));
-    tokenToString.insert(std::make_pair(LPAREN, "LPAREN"));
-    tokenToString.insert(std::make_pair(RPAREN, "RPAREN"));
-    tokenToString.insert(std::make_pair(DOT, "DOT"));
-    tokenToString.insert(std::make_pair(DCOLON, "DCOLON"));
-    tokenToString.insert(std::make_pair(DEF, "DEF"));
-    tokenToString.insert(std::make_pair(ERR, "ERR"));
-    tokenToString.insert(std::make_pair(DONE, "DONE"));
-}
+std::map<Token, std::string> tokenToString = {
+    {IF, "IF"},
+        {ELSE, "ELSE"},
+        {PRINT, "PRINT"},
+        {INTEGER, "INTEGER"},
+        {REAL, "REAL"},
+        {CHARACTER, "CHARACTER"},
+        {END, "END"},
+        {THEN, "THEN"},
+        {PROGRAM, "PROGRAM"},
+        {LEN, "LEN"},
+        {IDENT, "IDENT"},
+        {ICONST, "ICONST"},
+        {RCONST, "RCONST"},
+        {SCONST, "SCONST"},
+        {BCONST, "BCONST"},
+        {PLUS, "PLUS"},
+        {MINUS, "MINUS"},
+        {MULT, "MULT"},
+        {DIV, "DIV"},
+        {ASSOP, "ASSOP"},
+        {EQ, "EQ"},
+        {POW, "POW"},
+        {GTHAN, "GTHAN"},
+        {LTHAN, "LTHAN"},
+        {CAT, "CAT"},
+        {COMMA, "COMMA"},
+        {LPAREN, "LPAREN"},
+        {RPAREN, "RPAREN"},
+        {DOT, "DOT"},
+        {DCOLON, "DCOLON"},
+        {DEF, "DEF"},
+        {ERR, "ERR"},
+        {DONE, "DONE"}
+    };
+
 /*
 ● -all (optional): if present, every token is printed out when it is seen followed by its lexeme
 using the format described below.
@@ -83,12 +82,14 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    populateTokenMap();
-
     // Repeatedly call getNextToken until it returns DONE or ERR.
     LexItem lexItem;
     int linenumber = 0;
     int tokenCount = 0;
+    int identCount = 0;
+    int intCount = 0;
+    int realCount = 0;
+    int stringCount = 0;
 
     inFile.seekg(0); // reset input stream to beginning
     if (inFile.is_open())
@@ -98,7 +99,7 @@ int main(int argc, char *argv[])
             
             lexItem = getNextToken(inFile, linenumber);
             tokenCount++;
-            // Equals operator is overridden
+            // Equals operator is overridden, will compare token.
             if (lexItem == DONE)
             {
                 std::cout<<"DONE!!!!!"<<std::endl;
@@ -112,18 +113,26 @@ int main(int argc, char *argv[])
                 std::exit(1);
             }
 
-            /*
-            If the -all option is present, the program should print each token as it is read and recognized,
-one token per line. The output format for the token is the token name in all capital letters (for
-example, the token LPAREN should be printed out as the string LPAREN. In the case of the
-IDENT, ICONST, RCONST, SCONST, and ERR tokens, the token name should be followed
-by a colon and the lexeme between double quotes. For example, if an identifier “circle” and
-a string literal ‘The center of the circle through these points is’ are recognized, the -all output
-for them would be:
+            // Check what kind of token it is so we can do the necessary output
+            switch(lexItem.GetToken()){
+                case IDENT:
+                    identCount++;
+                    std::cout << tokenToString[lexItem.GetToken()] << ": " << '\''<<lexItem.GetLexeme()<<'\'' << endl;
+                    continue;
+                case ICONST:
+                    intCount++;
+                    continue;
+                case RCONST:
+                    realCount++;
+                    continue;
+                case SCONST:
+                    stringCount++;
+                    continue;
+                default:
+                    std::cout << tokenToString[lexItem.GetToken()] << std::endl;
+            }
 
-            */
-
-            std::cout << tokenToString[lexItem.GetToken()] << ": " << lexItem.GetLexeme() << endl;
+            
         }
     }
     else
