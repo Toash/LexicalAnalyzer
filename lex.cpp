@@ -25,6 +25,11 @@ LexItem getNextToken(istream &in, int &linenumber)
     string lexeme;
     char c;
 
+    string identifierRegex = "[a-zA-Z]([a-zA-Z]|[0-9]|_)*";
+    string intRegex = "[0-9]+";
+    string realRegex = "([0-9]*)\\.([0-9]+)";
+    char delimitType;
+
     while (in.get(c))
     {
         switch (state)
@@ -71,37 +76,94 @@ LexItem getNextToken(istream &in, int &linenumber)
             case ('-'):
                 return LexItem(MINUS, lexeme, linenumber);
             case ('*'):
-                // peek next char
+                // peek next char to check for power (**)
 
                 return LexItem(MULT, lexeme, linenumber);
             case ('/'):
                 return LexItem(DIV, lexeme, linenumber);
             case ('='):
+                // peek next char to check for ==
                 return LexItem(ASSOP, lexeme, linenumber);
-            case ('=='):
-                return LexItem(EQ, lexeme, linenumber);
+
             case ('<'):
                 return LexItem(LTHAN, lexeme, linenumber);
             case ('>'):
                 return LexItem(GTHAN, lexeme, linenumber);
 
-                // delimiters
-                /*
-                case (','):
-                    return LexItem(COMMA, lexeme, linenumber);
-                case ('('):
-                    return LexItem(LPAREN, lexeme, linenumber);
-                case (')'):
-                    return LexItem(RPAREN, lexeme, linenumber);
-                case ('.'):
-                    return LexItem(DOT, lexeme, linenumber);
-                case ('*'):
-                    return LexItem(DEF, lexeme, linenumber);
+            case ('.'):
+                //look ahead to see if it is actually a real number.
+                state = INREAL;
+
+            case ('\"'):
+                state = INSTRING;
+            case ('\''):
+                state = INSTRING;
+                
+                
+            // delimiters
+            /*
+            case (','):
+                return LexItem(COMMA, lexeme, linenumber);
+            case ('('):
+                return LexItem(LPAREN, lexeme, linenumber);
+            case (')'):
+                return LexItem(RPAREN, lexeme, linenumber);
+            case ('.'):
+                return LexItem(DOT, lexeme, linenumber);
+            case ('*'):
+                return LexItem(DEF, lexeme, linenumber);
+            }
+            */
+
+            // handle operators like **, ==, //, ::
+
+
+            //  1 or more integer
+            case ININT:
+                
+
+
+                if(c=='.'){
+                    // we have a real number!
+                    state = INREAL;
                 }
-                */
+                continue;
 
-                // handle operators like **, ==, //, ::
+            case INREAL:
+                
+                if(std::regex_match(lexeme + c,std::regex(realRegex))){
+                    lexeme += c;
+                } else{
+                    if(c==' '){
+                        return LexItem(RCONST,lexeme, linenumber);
+                    }
 
+                    //we have something else (.9 )
+                    return LexItem(ERR,lexeme,linenumber);
+                }
+            case INSTRING:
+
+                delimitType = lexeme[0];
+
+                //Strings must be on the same line
+                if(c == '\n'){
+                    return LexItem(ERR,lexeme,linenumber);
+                }
+
+                if(delimitType == '\''){
+                    if(c == '\''){
+                        lexeme += c;
+                        return LexItem(SCONST,lexeme,linenumber);
+                    }
+                }
+                else if(delimitType == '\"'){
+                    if(c == '\"'){
+                        lexeme += c;
+                        return LexItem(SCONST,lexeme,linenumber);
+                    }
+                }
+
+                lexeme += c;
             case INCOMMENT:
                 // comment lasts till end of line. does not have token.
                 if (c == '\n')
@@ -112,7 +174,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                 continue;
             case INID:
                 // check if the char is valid for an identifier.
-                string identifierRegex = "[a-zA-Z]([a-zA-Z]|[0-9]|_)*";
+                
                 if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
                 {
                     lexeme += c;

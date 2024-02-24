@@ -95,11 +95,13 @@ int main(int argc, char *argv[])
     {
         while (true)
         {
+            
             lexItem = getNextToken(inFile, linenumber);
             tokenCount++;
             // Equals operator is overridden
             if (lexItem == DONE)
             {
+                std::cout<<"DONE!!!!!"<<std::endl;
                 break;
             }
 
