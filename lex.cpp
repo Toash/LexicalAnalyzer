@@ -98,7 +98,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                 state = INSTRING;
             case ('\''):
                 state = INSTRING;
-                
+            }
                 
             // delimiters
             /*
@@ -117,7 +117,17 @@ LexItem getNextToken(istream &in, int &linenumber)
 
             // handle operators like **, ==, //, ::
 
-
+            case INID:
+                // check if the char is valid for an identifier.
+                //std::cout<<"IN IDENT STATE!!\n";
+                if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
+                {
+                    lexeme += c;
+                }
+                if(c == ' ' || c == '\n'){
+                    return LexItem(IDENT, lexeme, linenumber);
+                }
+                continue;
             //  1 or more integer
             case ININT:
                 
@@ -172,30 +182,9 @@ LexItem getNextToken(istream &in, int &linenumber)
                     state = START;
                 }
                 continue;
-            case INID:
-                // check if the char is valid for an identifier.
-                
-                if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
-                {
-                    lexeme += c;
-                }
-                // If end of file, or no longer IDENT
-                if (in.peek() == -1 || !std::regex_match(lexeme + c, std::regex(identifierRegex)))
-                {
-                    state = START;
-                    in.putback(c); // put back into stream
-
-                    // check for reserved keywords
-                    // reserved words are NOT case sensitive
-                    if (lexeme == "program")
-                    {
-                        return LexItem(PROGRAM, lexeme, linenumber);
-                        // return LexItem
-                    }
-                }
-                break;
+            
             }
         }
         return LexItem(DONE, "", linenumber);
     }
-}
+    
