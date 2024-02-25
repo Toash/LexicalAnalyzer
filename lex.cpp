@@ -3,11 +3,41 @@
 #include <cctype> // To recognize characters.
 #include <string>
 
-/*
-bool isDelimiter(char c){
-    return(c==' ' || c=='\n')
-}
-*/
+// get token name from enum
+std::map<Token, std::string> tokenToString = {
+    {IF, "IF"},
+    {ELSE, "ELSE"},
+    {PRINT, "PRINT"},
+    {INTEGER, "INTEGER"},
+    {REAL, "REAL"},
+    {CHARACTER, "CHARACTER"},
+    {END, "END"},
+    {THEN, "THEN"},
+    {PROGRAM, "PROGRAM"},
+    {LEN, "LEN"},
+    {IDENT, "IDENT"},
+    {ICONST, "ICONST"},
+    {RCONST, "RCONST"},
+    {SCONST, "SCONST"},
+    {BCONST, "BCONST"},
+    {PLUS, "PLUS"},
+    {MINUS, "MINUS"},
+    {MULT, "MULT"},
+    {DIV, "DIV"},
+    {ASSOP, "ASSOP"},
+    {EQ, "EQ"},
+    {POW, "POW"},
+    {GTHAN, "GTHAN"},
+    {LTHAN, "LTHAN"},
+    {CAT, "CAT"},
+    {COMMA, "COMMA"},
+    {LPAREN, "LPAREN"},
+    {RPAREN, "RPAREN"},
+    {DOT, "DOT"},
+    {DCOLON, "DCOLON"},
+    {DEF, "DEF"},
+    {ERR, "ERR"},
+    {DONE, "DONE"}};
 
 // map string value of keyword to its token;
 std::map<string, Token> stringToKeyword = {
@@ -40,6 +70,34 @@ LexItem id_or_kw(const string &lexeme, int linenum)
         // identifier
         return LexItem(IDENT, lexeme, linenum);
     }
+}
+
+// make it more user friendly to print out LexItems.
+ostream &operator<<(ostream &out, const LexItem &tok)
+{
+    Token token = tok.GetToken();
+
+    switch (token)
+    {
+    case ICONST:
+    case RCONST:
+    case BCONST:
+        std::cout << tokenToString[token] << ": " << '(' << tok.GetLexeme() << ')' << endl;
+        break;
+    case IDENT:
+        std::cout << tokenToString[token] << ": " << '\'' << tok.GetLexeme() << '\'' << endl;
+        break;
+    case SCONST:
+        std::cout << tokenToString[token] << ": " << '\"' << tok.GetLexeme() << '\"' << endl;
+        break;
+    case ERR:
+        std::cout << "Error in line " << tok.GetLinenum() << ": Unrecognized Lexeme {" << tok.GetLexeme() << "}" << endl;
+        std::exit(1);
+    default:
+        std::cout << tokenToString[token] << std::endl;
+    }
+
+    return out;
 }
 
 LexItem getNextToken(istream &in, int &linenumber)

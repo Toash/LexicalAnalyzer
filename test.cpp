@@ -14,6 +14,7 @@ std::set<int> integersWeHave;
 std::unordered_set<string> flags;
 
 // get token name from enum
+/*
 std::map<Token, std::string> tokenToString = {
     {IF, "IF"},
     {ELSE, "ELSE"},
@@ -48,7 +49,7 @@ std::map<Token, std::string> tokenToString = {
     {DEF, "DEF"},
     {ERR, "ERR"},
     {DONE, "DONE"}};
-
+*/
 /*
 ● -all (optional): if present, every token is printed out when it is seen followed by its lexeme
 using the format described below.
@@ -124,29 +125,22 @@ int main(int argc, char *argv[])
             if (lexItem.GetToken() != DONE)
                 tokenCount++;
 
+            std::cout << lexItem; // we overloaded to << operator!
             // Check what kind of token it is so we can do the necessary output
             switch (lexItem.GetToken())
             {
             case IDENT:
                 identifiersWeHave.insert(lexItem.GetLexeme());
-                std::cout << tokenToString[lexItem.GetToken()] << ": " << '\'' << lexItem.GetLexeme() << '\'' << endl;
                 continue;
             case ICONST:
                 integersWeHave.insert(std::stoi(lexItem.GetLexeme()));
-                std::cout << tokenToString[lexItem.GetToken()] << ": " << '(' << lexItem.GetLexeme() << ')' << endl;
                 continue;
             case RCONST:
                 realCount++;
-                std::cout << tokenToString[lexItem.GetToken()] << ": " << '(' << lexItem.GetLexeme() << ')' << endl;
                 continue;
             case SCONST:
                 stringCount++;
                 continue;
-            case ERR:
-                std::cout << "Error in line " << lexItem.GetLinenum() << ": Unrecognized Lexeme {" << lexItem.GetLexeme() << "}" << endl;
-                std::exit(1);
-            default:
-                std::cout << tokenToString[lexItem.GetToken()] << std::endl;
             }
         }
     }
