@@ -3,9 +3,13 @@
 #include <fstream> // input file
 #include <string>
 #include "lex.h"
+#include <unordered_set>
+
+// tokens we have (non duplicate)
+std::unordered_set<Token> tokensWeHave; 
+std::unordered_set<string> identifiersWeHave;
 
 // get token name from enum
-
 std::map<Token, std::string> tokenToString = {
     {IF, "IF"},
         {ELSE, "ELSE"},
@@ -98,7 +102,7 @@ int main(int argc, char *argv[])
         {
             
             lexItem = getNextToken(inFile, linenumber);
-            tokenCount++;
+            
             // Equals operator is overridden, will compare token.
             if (lexItem == DONE)
             {
@@ -113,10 +117,15 @@ int main(int argc, char *argv[])
                 std::exit(1);
             }
 
+            // we are counting all tokens except for the done token
+            if(lexItem.GetToken() != DONE) tokenCount++;   
+
             // Check what kind of token it is so we can do the necessary output
             switch(lexItem.GetToken()){
+                
+                 
                 case IDENT:
-                    identCount++;
+                    identifiersWeHave.insert(lexItem.GetLexeme());
                     std::cout << tokenToString[lexItem.GetToken()] << ": " << '\''<<lexItem.GetLexeme()<<'\'' << endl;
                     continue;
                 case ICONST:
@@ -131,7 +140,7 @@ int main(int argc, char *argv[])
                 default:
                     std::cout << tokenToString[lexItem.GetToken()] << std::endl;
             }
-
+                   
             
         }
     }
@@ -142,9 +151,10 @@ int main(int argc, char *argv[])
     }
 
     // Summary info
+    std::cout<<std::endl;
     std::cout << "Lines: " << linenumber << std::endl;
-    std::cout << "Total Tokens: " << tokenCount << std::endl;
-    std::cout << "Identifiers: " << identCount<< std::endl;
+    std::cout << "Total Tokens: " << tokenCount << std::endl; 
+    std::cout << "Identifiers: " << identifiersWeHave.size()<< std::endl;
     std::cout << "Integers: " << intCount<<std::endl;
     std::cout << "Reals: " << realCount<<std::endl;
     std::cout << "Strings: " << stringCount<<std::endl;

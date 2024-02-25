@@ -4,6 +4,12 @@
 #include <string>
 
 
+/*
+bool isDelimiter(char c){
+    return(c==' ' || c=='\n')
+}
+*/
+
 // map string value of keyword to its token;
 std::map<string,Token> stringToKeyword = {
     {"if", IF},
@@ -22,6 +28,9 @@ std::map<string,Token> stringToKeyword = {
     {"sconst", SCONST},
     {"bconst", BCONST}
     };
+
+
+
 
 LexItem id_or_kw(const string &lexeme, int linenum){
     //TODO: Make it case insensitive
@@ -138,17 +147,11 @@ LexItem getNextToken(istream &in, int &linenumber)
             if (std::regex_match(lexeme + c, std::regex(identifierRegex)))
             {
                 lexeme += c;
-            } else if(c == ' ' || c == '\n'){
-                state = START;
-                in.putback(c);
-                return id_or_kw(lexeme,linenumber);
             } else{
-                // It must be a , ., etc. THAT DOESNT DELIMIT
-                // putback so we can see what it is, but we have the 
                 state = START;
                 in.putback(c);
                 return id_or_kw(lexeme,linenumber);
-            }
+            } 
             continue;
         //  1 or more integer
         case ININT:
@@ -166,6 +169,9 @@ LexItem getNextToken(istream &in, int &linenumber)
             if(std::regex_match(lexeme + c,std::regex(realRegex))){
                 lexeme += c;
             } else{
+                // we need to differentiate between delimiter and error-
+                // for example .5a is error
+                // but .5\n is real number .5
                 if(c==' '){
                     return LexItem(RCONST,lexeme, linenumber);
                 }
