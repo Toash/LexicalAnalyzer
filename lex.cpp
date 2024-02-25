@@ -111,14 +111,41 @@ LexItem getNextToken(istream &in, int &linenumber)
             case ('-'):
                 return LexItem(MINUS, lexeme, linenumber);
             case ('*'):
-                // peek next char to check for power (**)
+                if (in.peek() == '*')
+                {
+                    in.get(c);
+                    return LexItem(POW, lexeme, linenumber);
+                }
+                else if (in.peek() == ',')
+                { // delimiters
+                    return LexItem(DEF, lexeme, linenumber);
+                }
+                else
+                {
+                    return LexItem(MULT, lexeme, linenumber);
+                }
 
-                return LexItem(MULT, lexeme, linenumber);
             case ('/'):
-                return LexItem(DIV, lexeme, linenumber);
+                if (in.peek() == '/')
+                {
+                    in.get(c);
+                    return LexItem(CAT, lexeme, linenumber);
+                }
+                else
+                {
+                    return LexItem(DIV, lexeme, linenumber);
+                }
+
             case ('='):
-                // peek next char to check for ==
-                return LexItem(ASSOP, lexeme, linenumber);
+                if (in.peek() == '=')
+                {
+                    in.get(c);
+                    return LexItem(EQ, lexeme, linenumber);
+                }
+                else
+                {
+                    return LexItem(ASSOP, lexeme, linenumber);
+                }
 
             case ('<'):
                 return LexItem(LTHAN, lexeme, linenumber);
@@ -131,6 +158,17 @@ LexItem getNextToken(istream &in, int &linenumber)
                 return LexItem(LPAREN, lexeme, linenumber);
             case (')'):
                 return LexItem(RPAREN, lexeme, linenumber);
+            case (':'):
+                if (in.peek() == ':')
+                {
+                    in.get(c);
+                    return LexItem(DCOLON, lexeme, linenumber);
+                }
+                else
+                {
+                    return LexItem(ERR, lexeme, linenumber);
+                }
+
             case ('.'):
                 // for example, .5
                 if (isdigit(in.peek()))
