@@ -6,45 +6,44 @@
 #include <unordered_set>
 
 // tokens we have (non duplicate)
-std::unordered_set<Token> tokensWeHave; 
+std::unordered_set<Token> tokensWeHave;
 std::unordered_set<string> identifiersWeHave;
 
 // get token name from enum
 std::map<Token, std::string> tokenToString = {
     {IF, "IF"},
-        {ELSE, "ELSE"},
-        {PRINT, "PRINT"},
-        {INTEGER, "INTEGER"},
-        {REAL, "REAL"},
-        {CHARACTER, "CHARACTER"},
-        {END, "END"},
-        {THEN, "THEN"},
-        {PROGRAM, "PROGRAM"},
-        {LEN, "LEN"},
-        {IDENT, "IDENT"},
-        {ICONST, "ICONST"},
-        {RCONST, "RCONST"},
-        {SCONST, "SCONST"},
-        {BCONST, "BCONST"},
-        {PLUS, "PLUS"},
-        {MINUS, "MINUS"},
-        {MULT, "MULT"},
-        {DIV, "DIV"},
-        {ASSOP, "ASSOP"},
-        {EQ, "EQ"},
-        {POW, "POW"},
-        {GTHAN, "GTHAN"},
-        {LTHAN, "LTHAN"},
-        {CAT, "CAT"},
-        {COMMA, "COMMA"},
-        {LPAREN, "LPAREN"},
-        {RPAREN, "RPAREN"},
-        {DOT, "DOT"},
-        {DCOLON, "DCOLON"},
-        {DEF, "DEF"},
-        {ERR, "ERR"},
-        {DONE, "DONE"}
-    };
+    {ELSE, "ELSE"},
+    {PRINT, "PRINT"},
+    {INTEGER, "INTEGER"},
+    {REAL, "REAL"},
+    {CHARACTER, "CHARACTER"},
+    {END, "END"},
+    {THEN, "THEN"},
+    {PROGRAM, "PROGRAM"},
+    {LEN, "LEN"},
+    {IDENT, "IDENT"},
+    {ICONST, "ICONST"},
+    {RCONST, "RCONST"},
+    {SCONST, "SCONST"},
+    {BCONST, "BCONST"},
+    {PLUS, "PLUS"},
+    {MINUS, "MINUS"},
+    {MULT, "MULT"},
+    {DIV, "DIV"},
+    {ASSOP, "ASSOP"},
+    {EQ, "EQ"},
+    {POW, "POW"},
+    {GTHAN, "GTHAN"},
+    {LTHAN, "LTHAN"},
+    {CAT, "CAT"},
+    {COMMA, "COMMA"},
+    {LPAREN, "LPAREN"},
+    {RPAREN, "RPAREN"},
+    {DOT, "DOT"},
+    {DCOLON, "DCOLON"},
+    {DEF, "DEF"},
+    {ERR, "ERR"},
+    {DONE, "DONE"}};
 
 /*
 ● -all (optional): if present, every token is printed out when it is seen followed by its lexeme
@@ -88,7 +87,7 @@ int main(int argc, char *argv[])
 
     // Repeatedly call getNextToken until it returns DONE or ERR.
     LexItem lexItem;
-    int linenumber = 0;
+    int linenumber = 1; // lines are 1 indexed.
     int tokenCount = 0;
     int identCount = 0;
     int intCount = 0;
@@ -100,48 +99,43 @@ int main(int argc, char *argv[])
     {
         while (true)
         {
-            
+
             lexItem = getNextToken(inFile, linenumber);
-            
+
             // Equals operator is overridden, will compare token.
             if (lexItem == DONE)
             {
-                //std::cout<<"DONE!!!!!"<<std::endl;
+                // std::cout<<"DONE!!!!!"<<std::endl;
                 break;
             }
 
-            // error handling
-            if (lexItem == ERR)
-            {
-                std::cout << "error on line " << linenumber;
-                std::exit(1);
-            }
-
             // we are counting all tokens except for the done token
-            if(lexItem.GetToken() != DONE) tokenCount++;   
+            if (lexItem.GetToken() != DONE)
+                tokenCount++;
 
             // Check what kind of token it is so we can do the necessary output
-            switch(lexItem.GetToken()){
-                
-                 
-                case IDENT:
-                    identifiersWeHave.insert(lexItem.GetLexeme());
-                    std::cout << tokenToString[lexItem.GetToken()] << ": " << '\''<<lexItem.GetLexeme()<<'\'' << endl;
-                    continue;
-                case ICONST:
-                    intCount++;
-                    continue;
-                case RCONST:
-                    realCount++;
-                    continue;
-                case SCONST:
-                    stringCount++;
-                    continue;
-                default:
-                    std::cout << tokenToString[lexItem.GetToken()] << std::endl;
+            switch (lexItem.GetToken())
+            {
+            case IDENT:
+                identifiersWeHave.insert(lexItem.GetLexeme());
+                std::cout << tokenToString[lexItem.GetToken()] << ": " << '\'' << lexItem.GetLexeme() << '\'' << endl;
+                continue;
+            case ICONST:
+                intCount++;
+                continue;
+            case RCONST:
+                realCount++;
+                std::cout << tokenToString[lexItem.GetToken()] << ": " << '(' << lexItem.GetLexeme() << ')' << endl;
+                continue;
+            case SCONST:
+                stringCount++;
+                continue;
+            case ERR:
+                std::cout << "Error in line " << lexItem.GetLinenum() << ": Unrecognized Lexeme {" << lexItem.GetLexeme() << "}" << endl;
+                std::exit(1);
+            default:
+                std::cout << tokenToString[lexItem.GetToken()] << std::endl;
             }
-                   
-            
         }
     }
     else
@@ -151,12 +145,12 @@ int main(int argc, char *argv[])
     }
 
     // Summary info
-    std::cout<<std::endl;
+    std::cout << std::endl;
     std::cout << "Lines: " << linenumber << std::endl;
-    std::cout << "Total Tokens: " << tokenCount << std::endl; 
-    std::cout << "Identifiers: " << identifiersWeHave.size()<< std::endl;
-    std::cout << "Integers: " << intCount<<std::endl;
-    std::cout << "Reals: " << realCount<<std::endl;
-    std::cout << "Strings: " << stringCount<<std::endl;
+    std::cout << "Total Tokens: " << tokenCount << std::endl;
+    std::cout << "Identifiers: " << identifiersWeHave.size() << std::endl;
+    std::cout << "Integers: " << intCount << std::endl;
+    std::cout << "Reals: " << realCount << std::endl;
+    std::cout << "Strings: " << stringCount << std::endl;
     return 0;
 }
