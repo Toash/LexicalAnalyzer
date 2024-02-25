@@ -4,10 +4,14 @@
 #include <string>
 #include "lex.h"
 #include <unordered_set>
+#include <set>
 
-// tokens we have (non duplicate)
-std::unordered_set<Token> tokensWeHave;
-std::unordered_set<string> identifiersWeHave;
+// When counting lexemes, we shouldn't consider duplicates -_-...
+std::set<Token> tokensWeHave;
+std::set<string> identifiersWeHave;
+std::set<int> integersWeHave;
+
+std::unordered_set<string> flags;
 
 // get token name from enum
 std::map<Token, std::string> tokenToString = {
@@ -67,6 +71,13 @@ int main(int argc, char *argv[])
         std::cout << "NO SPECIFIED INPUT FILE.\n";
         exit(1);
     }
+    if (argc > 2)
+    { // we have optional parameters!
+        for (int i = 2; i < argc; i++)
+        {
+            flags.insert(argv[i]);
+        }
+    }
 
     std::string fileName = argv[1];
     std::ifstream inFile;
@@ -121,7 +132,8 @@ int main(int argc, char *argv[])
                 std::cout << tokenToString[lexItem.GetToken()] << ": " << '\'' << lexItem.GetLexeme() << '\'' << endl;
                 continue;
             case ICONST:
-                intCount++;
+                integersWeHave.insert(std::stoi(lexItem.GetLexeme()));
+                std::cout << tokenToString[lexItem.GetToken()] << ": " << '(' << lexItem.GetLexeme() << ')' << endl;
                 continue;
             case RCONST:
                 realCount++;
@@ -146,11 +158,49 @@ int main(int argc, char *argv[])
 
     // Summary info
     std::cout << std::endl;
-    std::cout << "Lines: " << linenumber << std::endl;
+    std::cout << "Lines: " << linenumber - 1 << std::endl; // line numbers are 1 indexed.
     std::cout << "Total Tokens: " << tokenCount << std::endl;
     std::cout << "Identifiers: " << identifiersWeHave.size() << std::endl;
-    std::cout << "Integers: " << intCount << std::endl;
+    std::cout << "Integers: " << integersWeHave.size() << std::endl;
     std::cout << "Reals: " << realCount << std::endl;
     std::cout << "Strings: " << stringCount << std::endl;
+
+    // idents
+    if (auto flag = flags.find("-id") != flags.end())
+    {
+        std::cout << "IDENTIFIERS:\n";
+    }
+    // keywords
+    if (auto flag = flags.find("-kw") != flags.end())
+    {
+        std::cout << "KEYWORDS:\n";
+    }
+    // integers
+    if (auto flag = flags.find("-int") != flags.end())
+    {
+        std::cout << "INTEGERS:\n";
+        for (auto it = integersWeHave.begin(); it != integersWeHave.end(); it++)
+        {
+            if (std::next(it) == integersWeHave.end())
+            {
+                std::cout << *it << std::endl;
+            }
+            else
+            {
+                std::cout << *it << ", ";
+            }
+        }
+    }
+    // real
+    if (auto flag = flags.find("-real") != flags.end())
+    {
+        std::cout << "REALS:\n";
+    }
+    // strings
+    if (auto flag = flags.find("-str") != flags.end())
+    {
+        std::cout << "STRINGS:\n";
+    }
+
     return 0;
 }

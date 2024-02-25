@@ -66,14 +66,14 @@ LexItem getNextToken(istream &in, int &linenumber)
 
     while (in.get(c))
     {
+        if (c == '\n')
+        {
+            linenumber++;
+        }
         switch (state)
         {
         case START:
             // new lines are delimited by !
-            if (c == '\n')
-            {
-                linenumber++;
-            }
 
             if (std::isspace(c))
             {
@@ -170,12 +170,14 @@ LexItem getNextToken(istream &in, int &linenumber)
             {
                 lexeme += c;
             }
-            else if (c == '.')
+            else if (c == '.') // we have a real number!
             {
-                // we have a real number!
-
                 lexeme += c;
                 state = INREAL;
+            }
+            else if (c == ' ' || c == '\n')
+            { // delimited
+                return LexItem(ICONST, lexeme, linenumber);
             }
             continue;
 
@@ -228,7 +230,6 @@ LexItem getNextToken(istream &in, int &linenumber)
             // comment lasts till end of line. does not have token.
             if (c == '\n')
             {
-                linenumber++;
                 state = START;
             }
             continue;
