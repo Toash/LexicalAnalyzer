@@ -2,6 +2,14 @@
 #include <regex>  // we are using regex to find the tokens.
 #include <cctype> // To recognize characters.
 #include <string>
+#include <map>
+
+string lowercaseString(string str){
+    for(char &c : str){
+        c = tolower(c);
+    }
+    return str;
+}
 
 // get token name from enum
 std::map<Token, std::string> tokenToString = {
@@ -102,6 +110,8 @@ ostream &operator<<(ostream &out, const LexItem &tok)
 
 LexItem getNextToken(istream &in, int &linenumber)
 {
+    string s = "TESTINGTESTING123";
+    std::cout<<lowercaseString(s);
     // State diagram for lexical analyzer
     enum State
     {
@@ -246,7 +256,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                 state = INSTRING;
                 continue;
             }
-
+            return LexItem(ERR,lexeme,linenumber);
         case INID:
             // check if the char is valid for an identifier.
             // std::cout<<"IN IDENT STATE!!\n";
@@ -276,6 +286,11 @@ LexItem getNextToken(istream &in, int &linenumber)
             else if (c == ' ' || c == '\n')
             { // delimited
                 return LexItem(ICONST, lexeme, linenumber);
+            }
+            else{
+                //treat as delimiter according to output?
+                in.putback(c);
+                return LexItem(ICONST,lexeme,linenumber);
             }
             continue;
 
