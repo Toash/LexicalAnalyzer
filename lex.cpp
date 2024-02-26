@@ -88,7 +88,7 @@ ostream &operator<<(ostream &out, const LexItem &tok)
         std::cout << tokenToString[token] << ": " << '\'' << tok.GetLexeme() << '\'' << endl;
         break;
     case SCONST:
-        std::cout << tokenToString[token] << ": " << '\"' << tok.GetLexeme() << '\"' << endl;
+        std::cout << tokenToString[token] << ": " << '\"' << tok.GetLexeme().substr(1,tok.GetLexeme().size()-2) << '\"' << endl;
         break;
     case ERR:
         std::cout << "Error in line " << tok.GetLinenum() << ": Unrecognized Lexeme {" << tok.GetLexeme() << "}" << endl;
@@ -241,8 +241,10 @@ LexItem getNextToken(istream &in, int &linenumber)
 
             case ('\"'):
                 state = INSTRING;
+                continue;
             case ('\''):
                 state = INSTRING;
+                continue;
             }
 
         case INID:
@@ -302,7 +304,7 @@ LexItem getNextToken(istream &in, int &linenumber)
             // Strings must be on the same line
             if (c == '\n')
             {
-                // return LexItem(ERR, lexeme, linenumber);
+                return LexItem(ERR, lexeme, linenumber);
             }
 
             if (delimitType == '\'')
@@ -321,6 +323,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                     return LexItem(SCONST, lexeme, linenumber);
                 }
             }
+            lexeme += c;
 
         case INCOMMENT:
             // comment lasts till end of line. does not have token.
