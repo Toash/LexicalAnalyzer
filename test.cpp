@@ -5,10 +5,11 @@
 #include "lex.h"
 #include <unordered_set>
 #include <set>
+#include <map>
 
 // When counting lexemes, we shouldn't consider duplicates -_-...
 std::set<Token> tokensWeHave;
-std::set<string> identifiersWeHave;
+std::map<string, int> identifierCount;
 std::set<int> integersWeHave;
 
 std::unordered_set<string> flags;
@@ -130,7 +131,8 @@ int main(int argc, char *argv[])
             switch (lexItem.GetToken())
             {
             case IDENT:
-                identifiersWeHave.insert(lexItem.GetLexeme());
+                // add to count map
+                identifierCount[lexItem.GetLexeme()]++;
                 continue;
             case ICONST:
                 integersWeHave.insert(std::stoi(lexItem.GetLexeme()));
@@ -154,7 +156,7 @@ int main(int argc, char *argv[])
     std::cout << std::endl;
     std::cout << "Lines: " << linenumber - 1 << std::endl; // line numbers are 1 indexed.
     std::cout << "Total Tokens: " << tokenCount << std::endl;
-    std::cout << "Identifiers: " << identifiersWeHave.size() << std::endl;
+    std::cout << "Identifiers: " << identifierCount.size() << std::endl;
     std::cout << "Integers: " << integersWeHave.size() << std::endl;
     std::cout << "Reals: " << realCount << std::endl;
     std::cout << "Strings: " << stringCount << std::endl;
@@ -163,6 +165,12 @@ int main(int argc, char *argv[])
     if (auto flag = flags.find("-id") != flags.end())
     {
         std::cout << "IDENTIFIERS:\n";
+        for (auto it = identifierCount.begin(); it != identifierCount.end(); it++)
+        {
+            // print
+            std::cout << it->first << " (" << it->second << "), ";
+        }
+        std::cout << endl;
     }
     // keywords
     if (auto flag = flags.find("-kw") != flags.end())

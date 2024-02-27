@@ -4,8 +4,10 @@
 #include <string>
 #include <map>
 
-string lowercaseString(string str){
-    for(char &c : str){
+string lowercaseString(string str)
+{
+    for (char &c : str)
+    {
         c = tolower(c);
     }
     return str;
@@ -96,7 +98,7 @@ ostream &operator<<(ostream &out, const LexItem &tok)
         std::cout << tokenToString[token] << ": " << '\'' << tok.GetLexeme() << '\'' << endl;
         break;
     case SCONST:
-        std::cout << tokenToString[token] << ": " << '\"' << tok.GetLexeme().substr(1,tok.GetLexeme().size()-2) << '\"' << endl;
+        std::cout << tokenToString[token] << ": " << '\"' << tok.GetLexeme().substr(1, tok.GetLexeme().size() - 2) << '\"' << endl;
         break;
     case ERR:
         std::cout << "Error in line " << tok.GetLinenum() << ": Unrecognized Lexeme {" << tok.GetLexeme() << "}" << endl;
@@ -110,9 +112,9 @@ ostream &operator<<(ostream &out, const LexItem &tok)
 
 LexItem getNextToken(istream &in, int &linenumber)
 {
-    string s = "TESTINGTESTING123";
-    std::cout<<lowercaseString(s);
-    // State diagram for lexical analyzer
+    // string s = "TESTINGTESTING123";
+    // std::cout<<lowercaseString(s);
+    //  State diagram for lexical analyzer
     enum State
     {
         START,
@@ -256,7 +258,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                 state = INSTRING;
                 continue;
             }
-            return LexItem(ERR,lexeme,linenumber);
+            return LexItem(ERR, lexeme, linenumber);
         case INID:
             // check if the char is valid for an identifier.
             // std::cout<<"IN IDENT STATE!!\n";
@@ -268,7 +270,7 @@ LexItem getNextToken(istream &in, int &linenumber)
             {
                 state = START;
                 in.putback(c);
-                return id_or_kw(lexeme, linenumber);
+                return id_or_kw(lowercaseString(lexeme), linenumber);
             }
             continue;
         //  1 or more integer
@@ -287,10 +289,11 @@ LexItem getNextToken(istream &in, int &linenumber)
             { // delimited
                 return LexItem(ICONST, lexeme, linenumber);
             }
-            else{
-                //treat as delimiter according to output?
+            else
+            {
+                // treat as delimiter according to output?
                 in.putback(c);
-                return LexItem(ICONST,lexeme,linenumber);
+                return LexItem(ICONST, lexeme, linenumber);
             }
             continue;
 
