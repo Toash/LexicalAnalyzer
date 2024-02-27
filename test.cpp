@@ -11,6 +11,7 @@
 std::set<Token> tokensWeHave;
 std::map<string, int> identifierCount;
 std::set<int> integersWeHave;
+std::set<double> realsWeHave;
 
 std::unordered_set<string> flags;
 
@@ -123,10 +124,19 @@ int main(int argc, char *argv[])
             }
 
             // we are counting all tokens except for the done token
+            /*
             if (lexItem.GetToken() != DONE)
+            {
                 tokenCount++;
+            }
+            */
+            tokenCount++;
 
-            std::cout << lexItem; // we overloaded to << operator!
+            if (auto it = flags.find("-all") != flags.end())
+            {
+                std::cout << lexItem; // we overloaded to << operator!
+            }
+
             // Check what kind of token it is so we can do the necessary output
             switch (lexItem.GetToken())
             {
@@ -138,7 +148,7 @@ int main(int argc, char *argv[])
                 integersWeHave.insert(std::stoi(lexItem.GetLexeme()));
                 continue;
             case RCONST:
-                realCount++;
+                realsWeHave.insert(std::stod(lexItem.GetLexeme()));
                 continue;
             case SCONST:
                 stringCount++;
@@ -158,7 +168,7 @@ int main(int argc, char *argv[])
     std::cout << "Total Tokens: " << tokenCount << std::endl;
     std::cout << "Identifiers: " << identifierCount.size() << std::endl;
     std::cout << "Integers: " << integersWeHave.size() << std::endl;
-    std::cout << "Reals: " << realCount << std::endl;
+    std::cout << "Reals: " << realsWeHave.size() << std::endl;
     std::cout << "Strings: " << stringCount << std::endl;
 
     // idents
@@ -197,6 +207,17 @@ int main(int argc, char *argv[])
     if (auto flag = flags.find("-real") != flags.end())
     {
         std::cout << "REALS:\n";
+        for (auto it = realsWeHave.begin(); it != realsWeHave.end(); it++)
+        {
+            if (std::next(it) == realsWeHave.end())
+            {
+                std::cout << *it << std::endl;
+            }
+            else
+            {
+                std::cout << *it << ", ";
+            }
+        }
     }
     // strings
     if (auto flag = flags.find("-str") != flags.end())

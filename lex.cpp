@@ -269,7 +269,11 @@ LexItem getNextToken(istream &in, int &linenumber)
             else
             {
                 state = START;
-                in.putback(c);
+                if (c != '\n')
+                {
+                    in.putback(c);
+                }
+
                 return id_or_kw(lowercaseString(lexeme), linenumber);
             }
             continue;
@@ -292,7 +296,9 @@ LexItem getNextToken(istream &in, int &linenumber)
             else
             {
                 // treat as delimiter according to output?
+
                 in.putback(c);
+
                 return LexItem(ICONST, lexeme, linenumber);
             }
             continue;
@@ -306,13 +312,18 @@ LexItem getNextToken(istream &in, int &linenumber)
             }
             else
             {
+                // check for delimiters
                 if (c == ' ' || c == '\n')
                 {
+                    // suspended and c is not a token
                     return LexItem(RCONST, lexeme, linenumber);
                 }
+
                 else // we  have something else
                 {
-                    return LexItem(ERR, lexeme + c, linenumber);
+                    in.putback(c);
+                    return LexItem(RCONST, lexeme, linenumber);
+                    // return LexItem(ERR, lexeme + c, linenumber);
                 }
             }
         case INSTRING:
