@@ -70,7 +70,7 @@ std::map<string, Token> stringToKeyword = {
 LexItem id_or_kw(const string &lexeme, int linenum)
 {
     // TODO: Make it case insensitive
-    if (stringToKeyword.find(lexeme) != stringToKeyword.end())
+    if (stringToKeyword.find(lowercaseString(lexeme)) != stringToKeyword.end())
     {
         // keyword
         return LexItem(stringToKeyword[lexeme], lexeme, linenum);
@@ -274,7 +274,7 @@ LexItem getNextToken(istream &in, int &linenumber)
                     in.putback(c);
                 }
 
-                return id_or_kw(lowercaseString(lexeme), linenumber);
+                return id_or_kw(lexeme, linenumber);
             }
             continue;
         //  1 or more integer
