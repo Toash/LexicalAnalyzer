@@ -12,6 +12,7 @@ std::set<Token> tokensWeHave;
 std::map<string, int> identifierCount;
 std::set<int> integersWeHave;
 std::set<double> realsWeHave;
+std::set<string> stringsWeHave;
 
 std::unordered_set<string> flags;
 
@@ -103,10 +104,6 @@ int main(int argc, char *argv[])
     LexItem lexItem;
     int linenumber = 1; // lines are 1 indexed.
     int tokenCount = 0;
-    int identCount = 0;
-    int intCount = 0;
-    int realCount = 0;
-    int stringCount = 0;
 
     inFile.seekg(0); // reset input stream to beginning
     if (inFile.is_open())
@@ -151,7 +148,7 @@ int main(int argc, char *argv[])
                 realsWeHave.insert(std::stod(lexItem.GetLexeme()));
                 continue;
             case SCONST:
-                stringCount++;
+                stringsWeHave.insert(lexItem.GetLexeme());
                 continue;
             }
         }
@@ -169,7 +166,7 @@ int main(int argc, char *argv[])
     std::cout << "Identifiers: " << identifierCount.size() << std::endl;
     std::cout << "Integers: " << integersWeHave.size() << std::endl;
     std::cout << "Reals: " << realsWeHave.size() << std::endl;
-    std::cout << "Strings: " << stringCount << std::endl;
+    std::cout << "Strings: " << stringsWeHave.size() << std::endl;
 
     // idents
     if (auto flag = flags.find("-id") != flags.end())
@@ -223,6 +220,19 @@ int main(int argc, char *argv[])
     if (auto flag = flags.find("-str") != flags.end())
     {
         std::cout << "STRINGS:\n";
+        for (auto it = stringsWeHave.begin(); it != stringsWeHave.end(); it++)
+        {
+            string output = *it;
+            output = output.substr(1, output.size() - 2);
+            if (std::next(it) == stringsWeHave.end())
+            {
+                std::cout << "\"" << output << "\"" << std::endl;
+            }
+            else
+            {
+                std::cout << *it << ", ";
+            }
+        }
     }
 
     return 0;
