@@ -19,7 +19,7 @@ std::unordered_set<string> flags;
 
 int main(int argc, char *argv[])
 {
-
+    std::ifstream inFile;
     if (argc == 1)
     {
         std::cout << "NO SPECIFIED INPUT FILE.\n";
@@ -29,23 +29,31 @@ int main(int argc, char *argv[])
     { // we have optional parameters!
         for (int i = 2; i < argc; i++)
         {
-            // check for bad flags.
-            string flag = argv[i];
-            if (flag != "-all" || flag != "-int" || flag != "-real" || flag != "-str" || flag != "-id" || flag != "-kw")
+
+            string arg = argv[i];
+            // check for mulitple files
+            inFile.open(arg);
+            if (inFile)
             {
-                std::cout << "UNRECOGNIZED FLAG {" << flag << "}" << endl;
+                std::cout << "ONLY ONE FILE NAME IS ALLOWED" << endl;
+                std::exit(1);
+            }
+            // check for bad flags.
+            if (arg != "-all" || arg != "-int" || arg != "-real" || arg != "-str" || arg != "-id" || arg != "-kw")
+            {
+                std::cout << "UNRECOGNIZED FLAG {" << arg << "}" << endl;
                 exit(1);
             }
-            flags.insert(flag);
+            flags.insert(arg);
         }
     }
 
     std::string fileName = argv[1];
-    std::ifstream inFile;
+
     inFile.open(fileName);
     if (inFile.fail())
     {
-        std::cout << "CANNOT OPEN THE FILE: ";
+        std::cout << "CANNOT OPEN THE FILE ";
         std::cout << fileName << std::endl;
         exit(1);
     }
@@ -53,7 +61,7 @@ int main(int argc, char *argv[])
     inFile.seekg(0, std::ios::end);
     if (inFile.tellg() == 0)
     {
-        std::cout << "File is empty.\n";
+        std::cout << "Empty File.\n";
         exit(1);
     }
 
