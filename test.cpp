@@ -29,7 +29,14 @@ int main(int argc, char *argv[])
     { // we have optional parameters!
         for (int i = 2; i < argc; i++)
         {
-            flags.insert(argv[i]);
+            // check for bad flags.
+            string flag = argv[i];
+            if (flag != "-all" || flag != "-int" || flag != "-real" || flag != "-str" || flag != "-id" || flag != "-kw")
+            {
+                std::cout << "UNRECOGNIZED FLAG {" << flag << "}" << endl;
+                exit(1);
+            }
+            flags.insert(flag);
         }
     }
 
