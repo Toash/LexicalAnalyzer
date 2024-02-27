@@ -13,59 +13,9 @@ std::map<string, int> identifierCount;
 std::set<int> integersWeHave;
 std::set<double> realsWeHave;
 std::set<string> stringsWeHave;
+std::map<string, int> keywordsCount;
 
 std::unordered_set<string> flags;
-
-// get token name from enum
-/*
-std::map<Token, std::string> tokenToString = {
-    {IF, "IF"},
-    {ELSE, "ELSE"},
-    {PRINT, "PRINT"},
-    {INTEGER, "INTEGER"},
-    {REAL, "REAL"},
-    {CHARACTER, "CHARACTER"},
-    {END, "END"},
-    {THEN, "THEN"},
-    {PROGRAM, "PROGRAM"},
-    {LEN, "LEN"},
-    {IDENT, "IDENT"},
-    {ICONST, "ICONST"},
-    {RCONST, "RCONST"},
-    {SCONST, "SCONST"},
-    {BCONST, "BCONST"},
-    {PLUS, "PLUS"},
-    {MINUS, "MINUS"},
-    {MULT, "MULT"},
-    {DIV, "DIV"},
-    {ASSOP, "ASSOP"},
-    {EQ, "EQ"},
-    {POW, "POW"},
-    {GTHAN, "GTHAN"},
-    {LTHAN, "LTHAN"},
-    {CAT, "CAT"},
-    {COMMA, "COMMA"},
-    {LPAREN, "LPAREN"},
-    {RPAREN, "RPAREN"},
-    {DOT, "DOT"},
-    {DCOLON, "DCOLON"},
-    {DEF, "DEF"},
-    {ERR, "ERR"},
-    {DONE, "DONE"}};
-*/
-/*
-● -all (optional): if present, every token is printed out when it is seen followed by its lexeme
-using the format described below.
-● -int (optional): if present, prints out all the unique integer constants in numeric order.
-● -real (optional): if present, prints out all the unique real constants in numeric order.
-● -str (optional): if present, prints out all the unique string constants in order
-● -id (optional): if present, prints out all of the unique identifiers in alphanumeric order. Each
-identifier is followed by the number of its occurrences between parentheses.
-● -kw (optional): if present, prints out all of the unique keywords in alphabetical order. Each
-keyword is followed by the number of its occurrences between parentheses.
-● filename argument must be passed to main function. Your program should open the file
-and read from that filename.
-*/
 
 int main(int argc, char *argv[])
 {
@@ -116,17 +66,9 @@ int main(int argc, char *argv[])
             // Equals operator is overridden, will compare token.
             if (lexItem == DONE)
             {
-                // std::cout<<"DONE!!!!!"<<std::endl;
                 break;
             }
 
-            // we are counting all tokens except for the done token
-            /*
-            if (lexItem.GetToken() != DONE)
-            {
-                tokenCount++;
-            }
-            */
             tokenCount++;
 
             if (auto it = flags.find("-all") != flags.end())
@@ -149,6 +91,18 @@ int main(int argc, char *argv[])
                 continue;
             case SCONST:
                 stringsWeHave.insert(lexItem.GetLexeme());
+                continue;
+            case IF:
+            case ELSE:
+            case PRINT:
+            case INTEGER:
+            case REAL:
+            case CHARACTER:
+            case END:
+            case THEN:
+            case PROGRAM:
+            case LEN:
+                keywordsCount[lexItem.GetLexeme()]++;
                 continue;
             }
         }
@@ -174,15 +128,31 @@ int main(int argc, char *argv[])
         std::cout << "IDENTIFIERS:\n";
         for (auto it = identifierCount.begin(); it != identifierCount.end(); it++)
         {
-            // print
-            std::cout << it->first << " (" << it->second << "), ";
+            if (std::next(it) == identifierCount.end())
+            {
+                std::cout << it->first << " (" << it->second << ")" << endl;
+            }
+            else
+            {
+                std::cout << it->first << " (" << it->second << "), ";
+            }
         }
-        std::cout << endl;
     }
     // keywords
     if (auto flag = flags.find("-kw") != flags.end())
     {
         std::cout << "KEYWORDS:\n";
+        for (auto it = keywordsCount.begin(); it != keywordsCount.end(); it++)
+        {
+            if (std::next(it) == keywordsCount.end())
+            {
+                std::cout << it->first << " (" << it->second << ")" << endl;
+            }
+            else
+            {
+                std::cout << it->first << " (" << it->second << "), ";
+            }
+        }
     }
     // integers
     if (auto flag = flags.find("-int") != flags.end())
