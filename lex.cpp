@@ -6,11 +6,13 @@
 
 string lowercaseString(string str)
 {
-    for (char &c : str)
+    string lowercased = "";
+    for (char c : str)
     {
-        c = tolower(c);
+        lowercased += tolower(c);
     }
-    return str;
+    // std::cout << lowercased << "testingggg" << endl;
+    return lowercased;
 }
 
 // get token name from enum
@@ -73,7 +75,7 @@ LexItem id_or_kw(const string &lexeme, int linenum)
     if (stringToKeyword.find(lowercaseString(lexeme)) != stringToKeyword.end())
     {
         // keyword
-        return LexItem(stringToKeyword[lexeme], lexeme, linenum);
+        return LexItem(stringToKeyword[lowercaseString(lexeme)], lexeme, linenum);
     }
     else
     {
@@ -105,6 +107,7 @@ ostream &operator<<(ostream &out, const LexItem &tok)
         std::exit(1);
     default:
         std::cout << tokenToString[token] << std::endl;
+        break;
     }
 
     return out;
