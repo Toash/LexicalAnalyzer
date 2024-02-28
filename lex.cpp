@@ -364,7 +364,10 @@ LexItem getNextToken(istream &in, int &linenumber)
                 state = START;
             }
             continue;
+        default:
+            continue;
         }
+
     }
     // this returns once we exhaust the istream
     return LexItem(DONE, "", linenumber);

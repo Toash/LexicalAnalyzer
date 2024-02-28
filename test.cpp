@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
                 std::exit(1);
             }
             // check for bad flags.
-            if (arg != "-all" || arg != "-int" || arg != "-real" || arg != "-str" || arg != "-id" || arg != "-kw")
+            if (arg != "-all" && arg != "-int" && arg != "-real" && arg != "-str" && arg != "-id" && arg != "-kw")
             {
                 std::cout << "UNRECOGNIZED FLAG {" << arg << "}" << endl;
                 exit(1);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
             tokenCount++;
 
-            if (auto it = flags.find("-all") != flags.end())
+            if (flags.find("-all") != flags.end())
             {
                 std::cout << lexItem; // we overloaded to << operator!
             }
@@ -119,6 +119,8 @@ int main(int argc, char *argv[])
             case LEN:
                 keywordsCount[lexItem.GetLexeme()]++;
                 continue;
+            default:
+                continue;
             }
         }
     }
@@ -138,7 +140,7 @@ int main(int argc, char *argv[])
     std::cout << "Strings: " << stringsWeHave.size() << std::endl;
 
     // idents
-    if (auto flag = flags.find("-id") != flags.end())
+    if (flags.find("-id") != flags.end())
     {
         std::cout << "IDENTIFIERS:\n";
         for (auto it = identifierCount.begin(); it != identifierCount.end(); it++)
@@ -154,7 +156,7 @@ int main(int argc, char *argv[])
         }
     }
     // keywords
-    if (auto flag = flags.find("-kw") != flags.end())
+    if (flags.find("-kw") != flags.end())
     {
         std::cout << "KEYWORDS:\n";
         for (auto it = keywordsCount.begin(); it != keywordsCount.end(); it++)
@@ -170,7 +172,7 @@ int main(int argc, char *argv[])
         }
     }
     // integers
-    if (auto flag = flags.find("-int") != flags.end())
+    if (flags.find("-int") != flags.end())
     {
         std::cout << "INTEGERS:\n";
         for (auto it = integersWeHave.begin(); it != integersWeHave.end(); it++)
@@ -186,7 +188,7 @@ int main(int argc, char *argv[])
         }
     }
     // real
-    if (auto flag = flags.find("-real") != flags.end())
+    if (flags.find("-real") != flags.end())
     {
         std::cout << "REALS:\n";
         for (auto it = realsWeHave.begin(); it != realsWeHave.end(); it++)
@@ -202,7 +204,7 @@ int main(int argc, char *argv[])
         }
     }
     // strings
-    if (auto flag = flags.find("-str") != flags.end())
+    if (flags.find("-str") != flags.end())
     {
         std::cout << "STRINGS:\n";
         for (auto it = stringsWeHave.begin(); it != stringsWeHave.end(); it++)
