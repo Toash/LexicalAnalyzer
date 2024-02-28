@@ -42,7 +42,7 @@ Character(s) and their respective Token:
 | .         | DOT    | Dot                   |
 | *         | DEF    | Default mark          |
 
-The program accepts optional flags, which affects what will be printed. Flags should be specified after the file name, and the file name should be the first argument.
+The program accepts optional flags, which affects what will be printed. **Flags should be specified after the file name, and the file name should be the first argument.**
 
 | Option   | Description                                                                        |
 |----------|------------------------------------------------------------------------------------|
