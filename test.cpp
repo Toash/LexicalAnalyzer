@@ -7,6 +7,7 @@
 #include <set>
 #include <map>
 
+
 // When counting lexemes, we shouldn't consider duplicates -_-...
 std::set<Token> tokensWeHave;
 std::map<string, int> identifierCount;
@@ -16,26 +17,27 @@ std::set<string> stringsWeHave;
 std::map<string, int> keywordsCount;
 
 std::unordered_set<string> flags;
+std::ifstream inFile;
 
 int main(int argc, char *argv[])
 {
-    std::ifstream inFile;
-    if (argc == 1)
+
+    if (argc <= 1)
     {
         std::cout << "NO SPECIFIED INPUT FILE.\n";
         exit(1);
     }
-    if (argc > 2)
+    else
     { // we have optional parameters!
         for (int i = 2; i < argc; i++)
         {
 
             string arg = argv[i];
-            // check for mulitple files
-            inFile.open(arg);
-            if (inFile)
+            
+            //everything besides filename should be a flag
+            if (arg[0] != '-')
             {
-                std::cout << "ONLY ONE FILE NAME IS ALLOWED" << endl;
+                std::cout << "ONLY ONE FILE NAME IS ALLOWED." << endl;
                 std::exit(1);
             }
             // check for bad flags.
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
     }
 
     std::string fileName = argv[1];
-
+    std::ifstream inFile;
     inFile.open(fileName);
     if (inFile.fail())
     {

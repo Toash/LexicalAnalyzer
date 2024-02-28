@@ -313,22 +313,20 @@ LexItem getNextToken(istream &in, int &linenumber)
                 lexeme += c;
                 continue;
             }
-            else
+            else if (c == ' ' || c == '\n' || c=='\t')
             {
-                // check for delimiters
-                if (c == ' ' || c == '\n')
-                {
-                    // suspended and c is not a token
-                    return LexItem(RCONST, lexeme, linenumber);
-                }
-
-                else // we  have something else
-                {
-                    in.putback(c);
-                    return LexItem(RCONST, lexeme, linenumber);
-                    // return LexItem(ERR, lexeme + c, linenumber);
-                }
+                return LexItem(RCONST, lexeme, linenumber);
             }
+
+            else if(c== ')')
+            {
+                in.putback(c);
+                return LexItem(RCONST, lexeme, linenumber);
+                
+            } else{
+                return LexItem(ERR, lexeme + c, linenumber);
+            }
+            
         case INSTRING:
 
             delimitType = lexeme[0];
@@ -336,6 +334,7 @@ LexItem getNextToken(istream &in, int &linenumber)
             // Strings must be on the same line
             if (c == '\n')
             {
+                linenumber--; // this is probably bad practice
                 return LexItem(ERR, lexeme, linenumber);
             }
 

@@ -131,7 +131,8 @@
     "ratio": "cpp",
     "variant": "cpp",
     "unordered_set": "cpp",
-    "set": "cpp"
+    "set": "cpp",
+    "codecvt": "cpp"
   },
   "C_Cpp.errorSquiggles": "enabled"
 }
